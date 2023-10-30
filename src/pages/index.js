@@ -1,7 +1,7 @@
-import Login from './login'
 import Auth from './auth'
+import Today from './today'
 
 export {
-    Login,
-    Auth
+    Auth,
+    Today
 }

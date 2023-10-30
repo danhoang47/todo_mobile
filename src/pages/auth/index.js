@@ -15,7 +15,8 @@ function Auth() {
 	const [type, setType] = useState("signin");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [isInputFocus, setInputFocus] = useState(false);
+	const [isEmailInputFocus, setEmailInputFocus] = useState(false);
+	const [isPasswordInputFocus, setPasswordInputFocus] = useState(false);
 	const [emailError, setEmailError] = useState("");
 	const [passwordError, setPasswordError] = useState("");
 	const { setUser } = useUserContext();
@@ -56,17 +57,17 @@ function Auth() {
 					styles.input,
 					{
 						marginBottom: emailError ? 4 : 14,
-						borderColor: isInputFocus ? "black" : "#ebebeb",
+						borderColor: isEmailInputFocus ? "black" : "#ebebeb",
 					},
 				]}
 				value={email}
 				onChangeText={setEmail}
 				placeholder="Email"
 				onFocus={() => {
-					setInputFocus(true);
+					setEmailInputFocus(true);
 				}}
 				onBlur={() => {
-					setInputFocus(false);
+					setEmailInputFocus(false);
 				}}
 			/>
 			{emailError && <Text style={styles.error}>{emailError}</Text>}
@@ -75,7 +76,7 @@ function Auth() {
 					styles.input,
 					{
 						marginBottom: emailError ? 4 : 14,
-						borderColor: isInputFocus ? "black" : "#ebebeb",
+						borderColor: isPasswordInputFocus ? "black" : "#ebebeb",
 					},
 				]}
 				value={password}
@@ -83,14 +84,18 @@ function Auth() {
 				placeholder="Password"
 				secureTextEntry
 				onFocus={() => {
-					setInputFocus(true);
+					setPasswordInputFocus(true);
 				}}
 				onBlur={() => {
-					setInputFocus(false);
+					setPasswordInputFocus(false);
 				}}
 			/>
 			{passwordError && <Text style={styles.error}>{passwordError}</Text>}
-			<Pressable style={styles.submitBtn} onPress={onSignInPress}>
+			<Pressable
+				style={styles.submitBtn}
+				onPress={onSignInPress}
+				disabled={Boolean(emailError || passwordError)}
+			>
 				<Text style={styles.submitBtnTitle}>Sign in</Text>
 			</Pressable>
 			<TextDivider dividerDescription={"or"} />
@@ -120,6 +125,8 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		position: "relative",
+		paddingHorizontal: 20,
+		paddingVertical: 14
 	},
 	banner: {
 		position: "relative",
