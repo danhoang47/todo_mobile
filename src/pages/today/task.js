@@ -1,8 +1,10 @@
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import Checkbox from "expo-checkbox";
 import { FontAwesome5 } from "@expo/vector-icons";
+import { useState } from "react";
 
-function Task({ task, onTaskSelected, isSelected }) {
+function Task({ task, onTaskSelected, isSelected, navigation, onResetStatePressed }) {
+	const [hasHovered, setHovered] = useState(false);
 
 	return (
 		<Pressable
@@ -13,7 +15,9 @@ function Task({ task, onTaskSelected, isSelected }) {
 				}
 			]}
 			onPress={() => {
-				console.log("task pressed");
+				navigation.navigate("edit", {
+					taskId: task.id
+				})
 			}}
 		>
 			<View style={styles.taskHeader}>
@@ -44,14 +48,19 @@ function Task({ task, onTaskSelected, isSelected }) {
 				<Pressable
 					style={{
 						position: "absolute",
-						right: 0,
-						top: "16%",
+						right: -10,
+						padding: 10,
+					}}
+					onPressIn={() => setHovered(true)}
+					onPressOut={() => setHovered(false)}
+					onPress={() => {
+						onResetStatePressed(task.id)
 					}}
 				>
 					<FontAwesome5
 						size={16}
-						name="angle-right"
-						color="#858383"
+						name="undo-alt"
+						color={hasHovered ? "#000" : "#858383"}
 					/>
 				</Pressable>
 			</View>
@@ -68,7 +77,7 @@ function Task({ task, onTaskSelected, isSelected }) {
 						name="calendar-alt"
 						color="#858383"
 					/>
-					<Text>{task.dueDate}</Text>
+					<Text>{new Date(task.dueDate).toLocaleDateString()}</Text>
 				</View>
 				<View
 					style={{
@@ -109,7 +118,7 @@ function Task({ task, onTaskSelected, isSelected }) {
 							borderRadius: 4,
 						}}
 					></View>
-					<Text>List 1</Text>
+					<Text>{task.list.title}</Text>
 				</View>
 			</View>
 		</Pressable>
@@ -133,7 +142,7 @@ const styles = StyleSheet.create({
 	taskExtraInfor: {
 		marginLeft: 34,
 		flexDirection: "row",
-		gap: 20,
+		gap: 10,
 		alignItems: "center",
 	},
 });

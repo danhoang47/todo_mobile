@@ -22,19 +22,15 @@ function Auth() {
 	const { setUser } = useUserContext();
 
 	const onSignInPress = () => {
+		if (!email) setEmailError("Required email")
+		if (!password) setPasswordError("Required password")
+		
+		
 		if (email && password) {
 			setUser({
 				email,
 				password,
 			});
-		}
-
-		if (!email) {
-			setEmailError("Required email");
-		}
-
-		if (!password) {
-			setPasswordError("Required password");
 		}
 	};
 
@@ -61,7 +57,10 @@ function Auth() {
 					},
 				]}
 				value={email}
-				onChangeText={setEmail}
+				onChangeText={(text) => {
+					setEmail(text)
+					setEmailError(text ? '' : "Required email")
+				}}
 				placeholder="Email"
 				onFocus={() => {
 					setEmailInputFocus(true);
@@ -80,7 +79,10 @@ function Auth() {
 					},
 				]}
 				value={password}
-				onChangeText={setPassword}
+				onChangeText={(text) => {
+					setPassword(text)
+					setPasswordError(text ? '' : "Required password");
+				}}
 				placeholder="Password"
 				secureTextEntry
 				onFocus={() => {

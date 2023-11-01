@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "title": "Tag 1",
+        "color": "#f72585"
+    },
+    {
+        "id": 2,
+        "title": "Tag 2",
+        "color": "#ffbe0b"
+    },
+    {
+        "id": 3,
+        "title": "Tag 3",
+        "color": "#eb5e28"
+    },
+    {
+        "id": 4,
+        "title": "Tag 1",
+        "color": "#eb5e28"
+    },
+    {
+        "id": 5,
+        "title": "Tag 2",
+        "color": "#eb5e29"
+    },
+    {
+        "id": 6,
+        "title": "Tag 3",
+        "color": "#eb5e28"
+    },
+    {
+        "id": 7,
+        "title": "Tag 4",
+        "color": "#eb5e28"
+    }
+]

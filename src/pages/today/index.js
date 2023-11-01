@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useTaskContext } from "../../context/tasks";
 import Task from "./task";
+import { compareDate } from "../../utils";
 
-function Today() {
+function Today({ navigation }) {
 	const [selectedTasks, setSelectedTasks] = useState([]);
-	const { tasks, setTasks } = useTaskContext();
+	const { joinedTasks: tasks, setTasks } = useTaskContext();
+	const orderByDateTasks = useMemo(
+		() =>
+			[...tasks].sort((first, second) =>
+				compareDate(first.dueDate, second.dueDate, "asc")
+			),
+		[tasks]
+	);
 
 	const onTaskSelected = (id) => {
 		if (selectedTasks.includes(id)) {
@@ -18,21 +26,35 @@ function Today() {
 		setSelectedTasks((prev) => [...prev, id]);
 	};
 
-    const onRemoveActionPressed = () => {
-        setTasks(prev => prev.filter(({ id }) => !selectedTasks.includes(id)))
-        setSelectedTasks([])
-    }
+	const onRemoveActionPressed = () => {
+		setTasks((prev) =>
+			prev.filter(({ id }) => !selectedTasks.includes(id))
+		);
+		setSelectedTasks([]);
+	};
 
-    const onCompleteActionPressed = () => {
-        setTasks(prev => prev.map(task => {
-            if (selectedTasks.includes(task.id)) {
-                task.state = 1
-            }
+	const onCompleteActionPressed = () => {
+		setTasks((prev) =>
+			prev.map((task) => {
+				if (selectedTasks.includes(task.id)) {
+					task.state = 1;
+				}
 
-            return task
-        }))
-        setSelectedTasks([])
-    }
+				return task;
+			})
+		);
+		setSelectedTasks([]);
+	};
+
+	const onAddNewTaskPressed = () => {
+		navigation.navigate("edit");
+	};
+
+	const onResetStatePressed = (id) => {
+		setTasks((prev) =>
+			prev.map((task) => (task.id === id ? { ...task, state: 0 } : task))
+		);
+	};
 
 	return (
 		<View style={styles.container}>
@@ -57,19 +79,24 @@ function Today() {
 				</View>
 			</View>
 			<View style={styles.body}>
-				<Pressable style={styles.addNewTaskBtn}>
+				<Pressable
+					style={styles.addNewTaskBtn}
+					onPress={onAddNewTaskPressed}
+				>
 					<FontAwesome5 size={16} name="plus" color="#858383" />
 					<Text style={styles.addNewTaskBtnTitle}>Add New Task</Text>
 				</Pressable>
 				<View>
 					<FlatList
-						data={tasks}
+						data={orderByDateTasks}
 						renderItem={({ item: task }) => (
-							<Task 
-                                task={task} 
-                                onTaskSelected={onTaskSelected} 
-                                isSelected={selectedTasks.includes(task.id)} 
-                            />
+							<Task
+								task={task}
+								onTaskSelected={onTaskSelected}
+								isSelected={selectedTasks.includes(task.id)}
+								navigation={navigation}
+								onResetStatePressed={onResetStatePressed}
+							/>
 						)}
 						keyExtractor={(item) => item.id}
 						ItemSeparatorComponent={
@@ -81,6 +108,9 @@ function Today() {
 								}}
 							/>
 						}
+						contentContainerStyle={{
+							paddingBottom: 160,
+						}}
 					/>
 				</View>
 			</View>
@@ -98,7 +128,7 @@ function Today() {
 						</Text>
 					</Pressable>
 					<Pressable
-                        onPress={onCompleteActionPressed}
+						onPress={onCompleteActionPressed}
 						style={{
 							backgroundColor: "#ffd43b",
 							borderRadius: 10,
