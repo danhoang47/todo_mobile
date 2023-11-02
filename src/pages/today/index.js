@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useTaskContext } from "../../context/tasks";
-import Task from "./task";
+import Task from "../../features/task";
 import { compareDate } from "../../utils";
 
 function Today({ navigation }) {
