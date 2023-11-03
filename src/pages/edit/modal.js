@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Text, View, StyleSheet, TextInput, Pressable } from "react-native";
 import ReactNativeModal from "react-native-modal";
 

@@ -14,20 +14,24 @@ import Modal from "./modal";
 
 function Edit({ route, navigation }) {
 	const isCreateMode = !route.params;
+	const [shouldActionButtonsShow, setActionButtonsShow] = useState(isCreateMode);
 	const { joinedTasks: tasks, setTasks } = useTaskContext();
 	const { lists } = useListContext();
 	const { tags } = useTagContext();
-	const [task, setTask] = useState({
+	const defaultTask = useRef({
 		id: Math.random(),
 		state: 0,
 		dueDate: new Date(),
 		listId: lists[0].id,
-	});
+	})
+	const [task, setTask] = useState(defaultTask.current);
 
 	useEffect(() => {
 		if (!isCreateMode) {
 			const { taskId } = route.params;
-			setTask(tasks.find(({ id }) => id === taskId));
+			const findedTask = tasks.find(({ id }) => id === taskId)
+			defaultTask.current = findedTask
+			setTask(findedTask);
 		}
 	}, []);
 
@@ -89,7 +93,6 @@ function Edit({ route, navigation }) {
 	};
 
 	const onSubTaskChecked = (id) => {
-		console.log(id);
 		setTask((prev) => ({
 			...prev,
 			subTasks: prev.subTasks.map((subTask) =>
@@ -115,6 +118,11 @@ function Edit({ route, navigation }) {
 		navigation.goBack();
 	};
 
+	const onTaskCanceledPressed = () => {
+		setTask(defaultTask.current)
+		setActionButtonsShow(false)
+	}
+
 	const scrollRef = useRef(null);
 	// TODO: get param from route.params
 
@@ -122,9 +130,22 @@ function Edit({ route, navigation }) {
 		<View style={styles.container}>
 			<View style={styles.header}>
 				<Text style={styles.headerTitle}>Task:</Text>
-				<Pressable onPress={() => navigation.goBack()}>
-					<FontAwesome5 name="times" size={22} />
-				</Pressable>
+				<View
+					style={{
+						flexDirection: "row",
+						gap: 10,
+						alignItems: "center",
+					}}
+				>
+					{!isCreateMode && (
+						<Pressable onPress={() => setActionButtonsShow(true)}>
+							<FontAwesome5 name="pen" size={17} />
+						</Pressable>
+					)}
+					<Pressable onPress={() => navigation.goBack()}>
+						<FontAwesome5 name="times" size={22} />
+					</Pressable>
+				</View>
 			</View>
 			<View>
 				<TextInput
@@ -139,6 +160,7 @@ function Edit({ route, navigation }) {
 							title: text,
 						}));
 					}}
+					editable={shouldActionButtonsShow}
 				/>
 				<TextInput
 					numberOfLines={10}
@@ -157,6 +179,7 @@ function Edit({ route, navigation }) {
 							description: text,
 						}));
 					}}
+					editable={shouldActionButtonsShow}
 				/>
 				<View style={styles.selectField}>
 					<Text style={styles.selectInputLabel}>List</Text>
@@ -172,6 +195,7 @@ function Edit({ route, navigation }) {
 									listId: id,
 								}));
 							}}
+							enabled={shouldActionButtonsShow}
 						>
 							{lists.map(({ id, title }) => (
 								<Picker.Item
@@ -202,6 +226,7 @@ function Edit({ route, navigation }) {
 								},
 							});
 						}}
+						disabled={!shouldActionButtonsShow}
 					>
 						<Text
 							style={{
@@ -235,6 +260,7 @@ function Edit({ route, navigation }) {
 										: 0.6,
 								}}
 								onPress={() => onTagSelected(id)}
+								disabled={!shouldActionButtonsShow}
 							>
 								<Text
 									style={{
@@ -282,38 +308,40 @@ function Edit({ route, navigation }) {
 				subTask={selectedSubTask}
 				setSubTask={setSelectedSubTask}
 			/>
-			<View style={styles.selectedTasksAction}>
-				<Pressable onPress={() => navigation.goBack()}>
-					<Text
+			{shouldActionButtonsShow && (
+				<View style={styles.selectedTasksAction}>
+					<Pressable onPress={onTaskCanceledPressed}>
+						<Text
+							style={{
+								fontSize: 16,
+								textDecorationLine: "underline",
+								fontWeight: "bold",
+							}}
+						>
+							Cancel
+						</Text>
+					</Pressable>
+					<Pressable
 						style={{
-							fontSize: 16,
-							textDecorationLine: "underline",
-							fontWeight: "bold",
+							backgroundColor: "#ffd43b",
+							borderRadius: 10,
 						}}
+						onPress={onTaskSavedPressed}
 					>
-						Cancel
-					</Text>
-				</Pressable>
-				<Pressable
-					style={{
-						backgroundColor: "#ffd43b",
-						borderRadius: 10,
-					}}
-					onPress={onTaskSavedPressed}
-				>
-					<Text
-						style={{
-							padding: 10,
-							fontSize: 16,
-							fontWeight: "bold",
-							minWidth: 80,
-							textAlign: "center",
-						}}
-					>
-						Save
-					</Text>
-				</Pressable>
-			</View>
+						<Text
+							style={{
+								padding: 10,
+								fontSize: 16,
+								fontWeight: "bold",
+								minWidth: 80,
+								textAlign: "center",
+							}}
+						>
+							Save
+						</Text>
+					</Pressable>
+				</View>
+			)}
 		</View>
 	);
 }

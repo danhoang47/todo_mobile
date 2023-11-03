@@ -4,13 +4,18 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useTaskContext } from "../../context/tasks";
 import Task from "../../features/task";
-import { isToday } from "../../utils";
+import { useListContext } from "../../context/lists";
 
-function Today({ navigation }) {
+function List({ route, navigation }) {
+    const { listId } = route.params
 	const [selectedTasks, setSelectedTasks] = useState([]);
 	const { joinedTasks: tasks, setTasks } = useTaskContext();
-	const filteredDate = useMemo(
-		() => tasks.filter(task => isToday(new Date(task.dueDate))),
+    const { lists } = useListContext()
+
+    const listTitle = useMemo(() => lists.find(list => list.id === listId).title, [listId])
+
+	const filteredByListIdTasks = useMemo(
+		() => tasks.filter(task => task.listId === listId),
 		[tasks]
 	);
 
@@ -63,7 +68,7 @@ function Today({ navigation }) {
 				>
 					<FontAwesome5 name="bars" size={24} />
 				</Pressable>
-				<Text style={styles.headerTitle}>Today</Text>
+				<Text style={styles.headerTitle}>{listTitle}</Text>
 				<View
 					style={{
 						borderRadius: 6,
@@ -77,7 +82,7 @@ function Today({ navigation }) {
 							paddingHorizontal: 10,
 						}}
 					>
-						{filteredDate.length}
+						{filteredByListIdTasks.length}
 					</Text>
 				</View>
 			</View>
@@ -91,7 +96,7 @@ function Today({ navigation }) {
 				</Pressable>
 				<View>
 					<FlatList
-						data={filteredDate}
+						data={filteredByListIdTasks}
 						renderItem={({ item: task }) => (
 							<Task
 								task={task}
@@ -153,7 +158,7 @@ function Today({ navigation }) {
 	);
 }
 
-export default Today;
+export default List;
 
 const styles = StyleSheet.create({
 	container: {

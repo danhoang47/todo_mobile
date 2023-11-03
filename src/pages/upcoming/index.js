@@ -4,13 +4,25 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useTaskContext } from "../../context/tasks";
 import Task from "../../features/task";
-import { isToday } from "../../utils";
+import { isInThisWeek, isToday, isTomorrow } from "../../utils";
 
-function Today({ navigation }) {
+function Upcoming({ navigation }) {
 	const [selectedTasks, setSelectedTasks] = useState([]);
 	const { joinedTasks: tasks, setTasks } = useTaskContext();
-	const filteredDate = useMemo(
-		() => tasks.filter(task => isToday(new Date(task.dueDate))),
+	const todayTasks = useMemo(
+		() => tasks.filter((task) => isToday(new Date(task.dueDate))),
+		[tasks]
+	);
+	const tomorrowTasks = useMemo(
+		() => tasks.filter((task) => isTomorrow(new Date(task.dueDate))),
+		[tasks]
+	);
+	const thisWeekTasks = useMemo(
+		() => tasks.filter((task) => 
+            isInThisWeek(new Date(task.dueDate))
+            && !isToday(new Date(task.dueDate))
+            && !isTomorrow(new Date(task.dueDate))
+        ),
 		[tasks]
 	);
 
@@ -63,7 +75,7 @@ function Today({ navigation }) {
 				>
 					<FontAwesome5 name="bars" size={24} />
 				</Pressable>
-				<Text style={styles.headerTitle}>Today</Text>
+				<Text style={styles.headerTitle}>Upcoming</Text>
 				<View
 					style={{
 						borderRadius: 6,
@@ -77,11 +89,14 @@ function Today({ navigation }) {
 							paddingHorizontal: 10,
 						}}
 					>
-						{filteredDate.length}
+						{todayTasks.length +
+							tomorrowTasks.length +
+							thisWeekTasks.length}
 					</Text>
 				</View>
 			</View>
 			<View style={styles.body}>
+				<Text style={styles.sectionHeader}>Today</Text>
 				<Pressable
 					style={styles.addNewTaskBtn}
 					onPress={onAddNewTaskPressed}
@@ -91,7 +106,81 @@ function Today({ navigation }) {
 				</Pressable>
 				<View>
 					<FlatList
-						data={filteredDate}
+						data={todayTasks}
+						renderItem={({ item: task }) => (
+							<Task
+								task={task}
+								onTaskSelected={onTaskSelected}
+								isSelected={selectedTasks.includes(task.id)}
+								navigation={navigation}
+								onResetStatePressed={onResetStatePressed}
+							/>
+						)}
+						keyExtractor={(item) => item.id}
+						ItemSeparatorComponent={
+							<View
+								style={{
+									width: "100%",
+									height: 1.5,
+									backgroundColor: "#e6e6e6",
+								}}
+							/>
+						}
+						contentContainerStyle={{
+							paddingBottom: 40,
+						}}
+					/>
+				</View>
+			</View>
+			<View style={styles.body}>
+				<Text style={styles.sectionHeader}>Tomorrow</Text>
+				<Pressable
+					style={styles.addNewTaskBtn}
+					onPress={onAddNewTaskPressed}
+				>
+					<FontAwesome5 size={16} name="plus" color="#858383" />
+					<Text style={styles.addNewTaskBtnTitle}>Add New Task</Text>
+				</Pressable>
+				<View>
+					<FlatList
+						data={tomorrowTasks}
+						renderItem={({ item: task }) => (
+							<Task
+								task={task}
+								onTaskSelected={onTaskSelected}
+								isSelected={selectedTasks.includes(task.id)}
+								navigation={navigation}
+								onResetStatePressed={onResetStatePressed}
+							/>
+						)}
+						keyExtractor={(item) => item.id}
+						ItemSeparatorComponent={
+							<View
+								style={{
+									width: "100%",
+									height: 1.5,
+									backgroundColor: "#e6e6e6",
+								}}
+							/>
+						}
+						contentContainerStyle={{
+							paddingBottom: 40,
+						}}
+					/>
+				</View>
+			</View>
+			<View style={styles.body}>
+				<Text style={styles.sectionHeader}>This Week</Text>
+				<Pressable
+					style={styles.addNewTaskBtn}
+					onPress={onAddNewTaskPressed}
+				>
+					<FontAwesome5 size={16} name="plus" color="#858383" />
+					<Text style={styles.addNewTaskBtnTitle}>Add New Task</Text>
+				</Pressable>
+				<View>
+					<FlatList
+						data={thisWeekTasks}
 						renderItem={({ item: task }) => (
 							<Task
 								task={task}
@@ -153,7 +242,7 @@ function Today({ navigation }) {
 	);
 }
 
-export default Today;
+export default Upcoming;
 
 const styles = StyleSheet.create({
 	container: {
@@ -169,6 +258,11 @@ const styles = StyleSheet.create({
 		gap: 20,
 		marginBottom: 30,
 	},
+    sectionHeader: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10
+    },
 	headerTitle: {
 		fontSize: 24,
 		fontWeight: "bold",

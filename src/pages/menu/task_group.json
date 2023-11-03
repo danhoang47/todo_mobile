@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "routePath": "upcoming",
+        "title": "upcoming",
+        "icon": "angle-double-right"
+    },
+    {
+        "id": 2,
+        "routePath": "today",
+        "title": "today",
+        "icon": "list-ol"
+    },
+    {
+        "id": 3,
+        "routePath": "calendar",
+        "title": "calendar",
+        "icon": "calendar-alt"
+    },
+    {
+        "id": 4,
+        "routePath": "stickywall",
+        "title": "stick wall",
+        "icon": "sticky-note"
+    }
+]

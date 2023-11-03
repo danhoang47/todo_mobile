@@ -1,5 +1,5 @@
 
-function compareDate(first, second, order) {
+function compareDate(first, second, order = "asc") {
     const firstDateLocaleString = new Date(first).toLocaleDateString();
     const secondDateLocaleString = new Date(second).toLocaleDateString();
 
