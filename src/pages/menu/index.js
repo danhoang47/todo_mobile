@@ -81,7 +81,7 @@ function Menu({ navigation }) {
 								routePath={task.routePath}
 								title={task.title}
 								onNavigate={() => {
-									navigation.navigate(task.title);
+									navigation.navigate(task.routePath);
 								}}
 								badge={getTaskBadge(task.title)}
 								renderIndicator={() => (
