@@ -99,7 +99,7 @@ function Task({ task, onTaskSelected, isSelected, navigation, onResetStatePresse
 								fontSize: 12,
 							}}
 						>
-							{task.subTasks.length}
+							{task.subTasks?.length || 0}
 						</Text>
 					</View>
 					<Text>Subtasks</Text>
@@ -114,7 +114,7 @@ function Task({ task, onTaskSelected, isSelected, navigation, onResetStatePresse
 					<View
 						style={{
 							padding: 10,
-							backgroundColor: "yellow",
+							backgroundColor: task.list.color,
 							borderRadius: 4,
 						}}
 					></View>

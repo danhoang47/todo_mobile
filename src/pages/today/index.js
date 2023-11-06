@@ -4,14 +4,46 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useTaskContext } from "../../context/tasks";
 import Task from "../../features/task";
-import { isToday } from "../../utils";
+import Filter from "../../features/filter";
+import { compareDate, isToday } from "../../utils";
 
 function Today({ navigation }) {
 	const [selectedTasks, setSelectedTasks] = useState([]);
+	const [isFilterOpen, setFilterOpen] = useState(false);
 	const { joinedTasks: tasks, setTasks } = useTaskContext();
-	const filteredDate = useMemo(
-		() => tasks.filter(task => isToday(new Date(task.dueDate))),
-		[tasks]
+	const [filterOptions, setFilterOptions] = useState({
+		orderBy: "asc",
+		status: undefined,
+		listIds: [],
+		tagIds: [],
+	});
+
+	const filteredTasks = useMemo(
+		() =>
+			tasks
+				.filter((task) => {
+					const { status, listIds, tagIds } = filterOptions;
+					const isTaskToday = isToday(new Date(task.dueDate));
+					const isSastifyStatus = status !== undefined
+						? task.state === status
+						: true;
+					const isInList =
+						listIds.length !== 0
+							? listIds.includes(task.listId)
+							: true;
+					const isInTag =
+						tagIds.length !== 0
+							? task?.tags?.some(({ id }) =>
+									tagIds.includes(id)
+							  ) || false
+							: true;
+
+					return (
+						isTaskToday && isSastifyStatus && isInList && isInTag
+					);
+				})
+				.sort((first, second) => compareDate(first, second, filterOptions.orderBy)),
+		[tasks, filterOptions]
 	);
 
 	const onTaskSelected = (id) => {
@@ -77,9 +109,20 @@ function Today({ navigation }) {
 							paddingHorizontal: 10,
 						}}
 					>
-						{filteredDate.length}
+						{filteredTasks.length}
 					</Text>
 				</View>
+				<Pressable
+					style={{
+						position: "absolute",
+						right: 0,
+					}}
+					onPress={() => {
+						setFilterOpen(true);
+					}}
+				>
+					<FontAwesome5 name="sliders-h" size={22} />
+				</Pressable>
 			</View>
 			<View style={styles.body}>
 				<Pressable
@@ -91,7 +134,7 @@ function Today({ navigation }) {
 				</Pressable>
 				<View>
 					<FlatList
-						data={filteredDate}
+						data={filteredTasks}
 						renderItem={({ item: task }) => (
 							<Task
 								task={task}
@@ -149,6 +192,12 @@ function Today({ navigation }) {
 					</Pressable>
 				</View>
 			)}
+			<Filter
+				isVisible={isFilterOpen}
+				setVisible={setFilterOpen}
+				selectedFilterOptions={filterOptions}
+				setSelectedFilterOptions={setFilterOptions}
+			/>
 		</View>
 	);
 }

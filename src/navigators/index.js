@@ -1,6 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { useUserContext } from "../context/user";
-import { Auth, Today, Edit, StickyWall, Menu, Upcoming, List } from "../pages";
+import { Auth, Today, Edit, StickyWall, Menu, Upcoming, List, All } from "../pages";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const Stack = createNativeStackNavigator();
@@ -41,6 +41,16 @@ export default function Navigator() {
 					<Stack.Screen 
 						name="list"
 						component={List}
+						options={stackScreenDefaultOptions}
+					/>
+					<Stack.Screen 
+						name="login"
+						component={Auth}
+						options={stackScreenDefaultOptions}
+					/>
+					<Stack.Screen 
+						name="all"
+						component={All}
 						options={stackScreenDefaultOptions}
 					/>
 				</Stack.Navigator>

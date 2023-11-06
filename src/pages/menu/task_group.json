@@ -22,5 +22,11 @@
         "routePath": "stickywall",
         "title": "stick wall",
         "icon": "sticky-note"
+    },
+    {
+        "id": 5,
+        "routePath": "all",
+        "title": "all tasks",
+        "icon": "calendar-minus"
     }
 ]

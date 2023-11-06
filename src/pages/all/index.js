@@ -4,49 +4,50 @@ import { FontAwesome5 } from "@expo/vector-icons";
 
 import { useTaskContext } from "../../context/tasks";
 import Task from "../../features/task";
-import { isInThisWeek, isToday, isTomorrow } from "../../utils";
+import Filter from "../../features/filter";
+import { compareDate, isToday } from "../../utils";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
-function Upcoming({ navigation }) {
+function All({ navigation }) {
 	const [selectedTasks, setSelectedTasks] = useState([]);
+	const [isFilterOpen, setFilterOpen] = useState(false);
 	const { joinedTasks: tasks, setTasks } = useTaskContext();
-	const todayTasks = useMemo(
-		() => tasks.filter((task) => isToday(new Date(task.dueDate))),
-		[tasks]
-	);
-	const tomorrowTasks = useMemo(
-		() => tasks.filter((task) => isTomorrow(new Date(task.dueDate))),
-		[tasks]
-	);
-	const thisWeekTasks = useMemo(
-		() =>
-			tasks.filter(
-				(task) =>
-					isInThisWeek(new Date(task.dueDate)) &&
-					!isToday(new Date(task.dueDate)) &&
-					!isTomorrow(new Date(task.dueDate))
-			),
-		[tasks]
-	);
+	const [filterOptions, setFilterOptions] = useState({
+		orderBy: "asc",
+		status: undefined,
+		listIds: [],
+		tagIds: [],
+	});
+    const [selectedDate, setSelectedDate] = useState(undefined)
 
-	const sections = useMemo(
-		() => [
-			{
-				id: 1,
-				title: "Today",
-				data: todayTasks,
-			},
-			{
-				id: 2,
-				title: "Tomorrow",
-				data: tomorrowTasks,
-			},
-			{
-				id: 3,
-				title: "This Week",
-				data: thisWeekTasks,
-			},
-		],
-		[tasks]
+	const filteredTasks = useMemo(
+		() =>
+			tasks
+				.filter((task) => {
+					const { status, listIds, tagIds } = filterOptions;
+					// TODO: add filter date
+					const isTaskInSelectedDate = selectedDate ? compareDate(task.dueDate, selectedDate.getTime()) === 0 : true;
+					const isSastifyStatus =
+						status !== undefined ? task.state === status : true;
+					const isInList =
+						listIds.length !== 0
+							? listIds.includes(task.listId)
+							: true;
+					const isInTag =
+						tagIds.length !== 0
+							? task?.tags?.some(({ id }) =>
+									tagIds.includes(id)
+							  ) || false
+							: true;
+
+					return (
+						isTaskInSelectedDate && isSastifyStatus && isInList && isInTag
+					);
+				})
+				.sort((first, second) =>
+					compareDate(first, second, filterOptions.orderBy)
+				),
+		[tasks, filterOptions, selectedDate]
 	);
 
 	const onTaskSelected = (id) => {
@@ -98,7 +99,7 @@ function Upcoming({ navigation }) {
 				>
 					<FontAwesome5 name="bars" size={24} />
 				</Pressable>
-				<Text style={styles.headerTitle}>Upcoming</Text>
+				<Text style={styles.headerTitle}>{selectedDate ? selectedDate.toLocaleDateString() : "All Task"}</Text>
 				<View
 					style={{
 						borderRadius: 6,
@@ -112,67 +113,77 @@ function Upcoming({ navigation }) {
 							paddingHorizontal: 10,
 						}}
 					>
-						{todayTasks.length +
-							tomorrowTasks.length +
-							thisWeekTasks.length}
+						{filteredTasks.length}
 					</Text>
 				</View>
+				<Pressable
+					style={{
+						position: "absolute",
+						right: 0,
+					}}
+					onPress={() => {
+						setFilterOpen(true);
+					}}
+				>
+					<FontAwesome5 name="sliders-h" size={22} />
+				</Pressable>
+				<Pressable
+					style={{
+						position: "absolute",
+						right: 40,
+					}}
+					onPress={() => {
+						DateTimePickerAndroid.open({
+							mode: "date",
+							value: selectedDate
+								? new Date(selectedDate)
+								: new Date(),
+							onChange: (event, date) => {
+								setSelectedDate(date)
+							},
+
+						});
+					}}
+				>
+					<FontAwesome5 name="calendar-alt" size={22} />
+				</Pressable>
 			</View>
-			<FlatList
-				data={sections}
-				renderItem={({ item: section }) => (
-					<View style={styles.body}>
-						<Text style={styles.sectionHeader}>
-							{section.title}
-						</Text>
-						<Pressable
-							style={styles.addNewTaskBtn}
-							onPress={onAddNewTaskPressed}
-						>
-							<FontAwesome5
-								size={16}
-								name="plus"
-								color="#858383"
+			<View style={styles.body}>
+				<Pressable
+					style={styles.addNewTaskBtn}
+					onPress={onAddNewTaskPressed}
+				>
+					<FontAwesome5 size={16} name="plus" color="#858383" />
+					<Text style={styles.addNewTaskBtnTitle}>Add New Task</Text>
+				</Pressable>
+				<View>
+					<FlatList
+						data={filteredTasks}
+						renderItem={({ item: task }) => (
+							<Task
+								task={task}
+								onTaskSelected={onTaskSelected}
+								isSelected={selectedTasks.includes(task.id)}
+								navigation={navigation}
+								onResetStatePressed={onResetStatePressed}
 							/>
-							<Text style={styles.addNewTaskBtnTitle}>
-								Add New Task
-							</Text>
-						</Pressable>
-						<View>
-							<FlatList
-								data={section.data}
-								renderItem={({ item: task }) => (
-									<Task
-										task={task}
-										onTaskSelected={onTaskSelected}
-										isSelected={selectedTasks.includes(
-											task.id
-										)}
-										navigation={navigation}
-										onResetStatePressed={
-											onResetStatePressed
-										}
-									/>
-								)}
-								keyExtractor={(item) => item.id}
-								ItemSeparatorComponent={
-									<View
-										style={{
-											width: "100%",
-											height: 1.5,
-											backgroundColor: "#e6e6e6",
-										}}
-									/>
-								}
-								contentContainerStyle={{
-									paddingBottom: 40,
+						)}
+						keyExtractor={(item) => item.id}
+						ItemSeparatorComponent={
+							<View
+								style={{
+									width: "100%",
+									height: 1.5,
+									backgroundColor: "#e6e6e6",
 								}}
 							/>
-						</View>
-					</View>
-				)}
-				keyExtractor={(item) => item.id}
-			/>
+						}
+						contentContainerStyle={{
+							paddingBottom: 160,
+						}}
+					/>
+				</View>
+			</View>
 			{selectedTasks.length !== 0 && (
 				<View style={styles.selectedTasksAction}>
 					<Pressable onPress={onRemoveActionPressed}>
@@ -205,11 +216,17 @@ function Upcoming({ navigation }) {
 					</Pressable>
 				</View>
 			)}
+			<Filter
+				isVisible={isFilterOpen}
+				setVisible={setFilterOpen}
+				selectedFilterOptions={filterOptions}
+				setSelectedFilterOptions={setFilterOptions}
+			/>
 		</View>
 	);
 }
 
-export default Upcoming;
+export default All;
 
 const styles = StyleSheet.create({
 	container: {
@@ -225,18 +242,11 @@ const styles = StyleSheet.create({
 		gap: 20,
 		marginBottom: 30,
 	},
-	sectionHeader: {
-		fontSize: 16,
-		fontWeight: "bold",
-		marginBottom: 10,
-	},
 	headerTitle: {
 		fontSize: 24,
 		fontWeight: "bold",
 	},
-	body: {
-		marginBottom: 30
-	},
+	body: {},
 	addNewTaskBtn: {
 		padding: 12,
 		borderRadius: 6,

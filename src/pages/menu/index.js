@@ -51,6 +51,8 @@ function Menu({ navigation }) {
 							: count,
 					0
 				);
+			case "all": 
+				return tasks.length
 			default:
 				return undefined;
 		}
@@ -81,9 +83,9 @@ function Menu({ navigation }) {
 								routePath={task.routePath}
 								title={task.title}
 								onNavigate={() => {
-									navigation.navigate(task.title);
+									navigation.navigate(task.routePath);
 								}}
-								badge={getTaskBadge(task.title)}
+								badge={getTaskBadge(task.routePath)}
 								renderIndicator={() => (
 									<Indicator type="task" icon={task.icon} />
 								)}
@@ -171,7 +173,7 @@ function Menu({ navigation }) {
 				</Pressable>
 				<Text style={styles.footerTitle}>Settings</Text>
 			</View>
-			<Pressable style={styles.submitBtn}>
+			<Pressable style={styles.submitBtn} onPress={() => { navigation.navigate("login") }}>
 				<Text style={styles.submitBtnTitle}>Sign out</Text>
 			</Pressable>
 		</ScrollView>

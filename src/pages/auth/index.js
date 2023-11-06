@@ -10,8 +10,9 @@ import {
 
 import { useUserContext } from "../../context/user";
 import { TextDivider } from "../../components";
+import { validateEmail } from "../../utils";
 
-function Auth() {
+function Auth({ navigation }) {
 	const [type, setType] = useState("signin");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -22,7 +23,7 @@ function Auth() {
 	const { setUser } = useUserContext();
 
 	const onSignInPress = () => {
-		if (!email) setEmailError("Required email")
+		if (!validateEmail(email)) setEmailError("Required email")
 		if (!password) setPasswordError("Required password")
 		
 		
@@ -31,6 +32,10 @@ function Auth() {
 				email,
 				password,
 			});
+		}
+
+		if (navigation) {
+			navigation.navigate("today")
 		}
 	};
 
@@ -94,7 +99,12 @@ function Auth() {
 			/>
 			{passwordError && <Text style={styles.error}>{passwordError}</Text>}
 			<Pressable
-				style={styles.submitBtn}
+				style={[
+					styles.submitBtn,
+					{
+						opacity: Boolean(emailError || passwordError) ? 0.6 : 1
+					}
+				]}
 				onPress={onSignInPress}
 				disabled={Boolean(emailError || passwordError)}
 			>

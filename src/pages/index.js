@@ -5,6 +5,7 @@ import StickyWall from './sticky_wall'
 import Menu from './menu'
 import Upcoming from './upcoming'
 import List from './list'
+import All from './all'
 
 export {
     Auth,
@@ -13,5 +14,6 @@ export {
     StickyWall,
     Menu,
     Upcoming,
-    List
+    List,
+    All
 }

@@ -28,13 +28,12 @@ function isInThisWeek(date) {
 		);
 	}
 
-	const firstDateOfThisWeekStr = firstDateOfThisWeek.toLocaleDateString();
-	const lastDateOfThisWeekStr = lastDateOfThisWeek.toLocaleDateString();
-	const dateStr = date.toLocaleDateString()
-
+	const firstDateOfThisWeekTime = firstDateOfThisWeek.getTime();
+	const lastDateOfThisWeekTime = lastDateOfThisWeek.getTime();
+	const dateTime = date.getTime();
+	
 	return (
-		dateStr.localeCompare(firstDateOfThisWeekStr) > 0 &&
-		dateStr.localeCompare(lastDateOfThisWeekStr) < 0
+		dateTime > firstDateOfThisWeekTime && dateTime < lastDateOfThisWeekTime
 	);
 }
 
