@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, Pressable, FlatList,TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, Pressable, FlatList, TouchableOpacity } from "react-native";
 import { useStickyNoteContext } from "../../context/sticky_notes";
 import { FontAwesome5 } from "@expo/vector-icons";
 import DraggableFlatList, {
@@ -22,34 +22,35 @@ function StickyWall({ navigation }) {
 
 	const renderItem = ({ item, drag, isActive }) => {
 		return (
-		  <ScaleDecorator>
-			<TouchableOpacity
-			  activeOpacity={1}
-			  onLongPress={drag}
-			  disabled={isActive}
-			  onPress={() => {
-				navigation.navigate("edit_sticky", {
-					noteId: item.id
-				})
-			}}
-			  
-			>
-			  <View style={[styles.noteElement,{ backgroundColor: isActive ? "gray": item.color}]}>
-							
-								<View>
-									<Text style={styles.headerSticky}>{item.title}</Text>
-								</View>
-								<View>
-									<Text style={styles.bodySticky}>{item.content}</Text>
-								</View>
-							
-						</View>
-			</TouchableOpacity>
-		  </ScaleDecorator>
-		)
-	  }
+			<ScaleDecorator >
+				<TouchableOpacity
+					activeOpacity={1}
+					onLongPress={drag}
+					disabled={isActive}
+					onPress={() => {
+						navigation.navigate("edit_sticky", {
+							noteId: item.id
+						})
+					}}
+					style={{borderRadius: 10}}
 
-	
+				>
+					<View style={[styles.noteElement, { backgroundColor: isActive ? "gray" : item.color }]}>
+
+						<View>
+							<Text style={styles.headerSticky}>{item.title}</Text>
+						</View>
+						<View>
+							<Text style={styles.bodySticky}>{item.content}</Text>
+						</View>
+
+					</View>
+				</TouchableOpacity>
+			</ScaleDecorator>
+		)
+	}
+
+
 
 	return (
 		<View style={styles.container}>
@@ -74,13 +75,14 @@ function StickyWall({ navigation }) {
 			</View>
 			<DraggableFlatList
 				data={stickyNotes}
-				onDragEnd={({data}) =>{
-					setStickyNotes(data)}}
+				onDragEnd={({ data }) => {
+					setStickyNotes(data)
+				}}
 				keyExtractor={(item) => item.id}
 				renderItem={renderItem}
-				
-			
-				
+
+
+
 			/>
 
 		</View>

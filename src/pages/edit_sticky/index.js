@@ -10,19 +10,20 @@ import Modal from "../edit/modal";
 function EditSticky({ route, navigation }) {
 	const isCreateMode = !route.params;
 	const [shouldActionButtonsShow, setActionButtonsShow] = useState(isCreateMode);
-	const { notes, setNotes } = useStickyNoteContext();
+	const { stickyNotes, setStickyNotes } = useStickyNoteContext(); // ??????
 	const defaultStickyNote = useRef({
 		id: Math.random(),
 		title: "",
 		content: "",
-		color: Math.floor(Math.random()*16777215).toString(16),
+		color: '#'+(Math.random() * 0xFFFFFF << 0).toString(16).padStart(6, '0')
 	})
 	const [note, setNote] = useState(defaultStickyNote.current);
 
 	useEffect(() => {
+		// console.log(!isCreateMode,stickyNotes);
 		if (!isCreateMode) {
 			const { noteId } = route.params;
-			const findedNote = notes.find(note => note.id === noteId);
+			const findedNote = stickyNotes?.find(note => note.id === noteId);
 			defaultStickyNote.current = findedNote
 			setNote(findedNote);
 		}
@@ -32,9 +33,9 @@ function EditSticky({ route, navigation }) {
 
 	const onStickyNoteSavedPressed = () => {
 		if (isCreateMode) {
-			setNotes((prev) => [...prev, note]);
+			setStickyNotes((prev) => [...prev, note]);
 		} else {
-			setNotes((prev) =>
+			setStickyNotes((prev) =>
 				prev.map((t) => (t.id === note.id ? { ...note } : t))
 			);
 		}
