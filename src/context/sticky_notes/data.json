@@ -3,6 +3,18 @@
         "id": 1,
         "title": "Banner ads",
         "content": "dasdas\nasdasd\nasdasd",
-        "color": "#F72585"
+        "color": "#50e0e5"
+    },
+    {
+        "id": 2,
+        "title": "Test",
+        "content": "test drag drop",
+        "color": "#e5ca50"
+    },
+    {
+        "id": 3,
+        "title": "Another test",
+        "content": "continue testing",
+        "color": "#c5daf5"
     }
 ]
