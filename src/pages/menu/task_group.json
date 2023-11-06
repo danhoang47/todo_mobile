@@ -19,8 +19,8 @@
     },
     {
         "id": 4,
-        "routePath": "stickywall",
-        "title": "stick wall",
+        "routePath": "sticky_wall",
+        "title": "sticky wall",
         "icon": "sticky-note"
     },
     {
