@@ -22,7 +22,7 @@ function EditSticky({ route, navigation }) {
 	useEffect(() => {
 		if (!isCreateMode) {
 			const { noteId } = route.params;
-			const findedNote = notes.findOne(({ id }) => id === noteId)
+			const findedNote = notes.find(note => note.id === noteId);
 			defaultStickyNote.current = findedNote
 			setNote(findedNote);
 		}

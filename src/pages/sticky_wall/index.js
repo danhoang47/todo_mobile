@@ -79,7 +79,7 @@ function StickyWall({ navigation }) {
 				keyExtractor={(item) => item.id}
 				renderItem={renderItem}
 				
-				//m ghi cai tk mk copy paste cho nhanh dathnqde160587@fpt.edu.vn     dat123456
+			
 				
 			/>
 
